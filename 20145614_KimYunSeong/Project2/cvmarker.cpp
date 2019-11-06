@@ -1,9 +1,4 @@
-/**
-@file videocapture_basic.cpp
-@brief A very basic sample for using VideoCapture and VideoWriter
-@author PkLab.net
-@date Aug 24, 2016
-*/
+
 
 #include <opencv2/opencv.hpp>
 #include <iostream>
@@ -222,12 +217,30 @@ void draw_triangle(int* pos, int sizeX, int sizeY, int** result) {
 	}
 }
 
+void draw_elipse(int* pos, int sizeX, int sizeY, int** result) {
+	double a = abs(pos[2] - pos[0]) / 2;
+	double b = abs(pos[7] - pos[5]) / 2;
+	double center_x = pos[0] + a;
+	double center_y = pos[5] + b;
+
+	for (int y = 0; y < sizeY; y++) {
+		for (int x = 0; x < sizeX; x++) {
+			if (pow((x - center_x), 2) / pow(a, 2) + pow((y - center_y), 2) / pow(b, 2) <= 1) {
+				result[sizeY - 1 - y][x] = 1;
+			}
+			else {
+				result[sizeY - 1 - y][x] = 0;
+			}
+		}
+	}
+
+}
 
 
 int main()
 {
 	Mat image;
-	image = imread("img/triangle2.jpg", IMREAD_COLOR);
+	image = imread("img/circle1.jpg", IMREAD_COLOR);
 	vector<vector<int>> point_list = find_point(image);
 
 	int len_row_img = image.rows;
@@ -267,13 +280,24 @@ int main()
 
 		for (int i = 0; i < 8; i++)
 		{
-			cir_point_arr[i] = point_list[i / 2][0];
-			i++;
 			cir_point_arr[i] = point_list[i / 2][1];
+			i++;
+			cir_point_arr[i] = point_list[i / 2][0];
 		}
+
+		int sizeY = len_row_img;
+		int sizeX = len_col_img;
+
+		int** arr = new int* [sizeY];
+		for (int i = 0; i < sizeY; ++i) {
+			arr[i] = new int[sizeX];
+		}
+		int count = 0;
+		draw_elipse(cir_point_arr, sizeX, sizeY, arr);
+
 		//int ** new_img;
 		//함수 실행
-		//compare_image(image, new_img);
+		compare_image(image, arr);
 	}
 
 
